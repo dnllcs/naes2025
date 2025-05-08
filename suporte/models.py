@@ -7,7 +7,7 @@ class Pedido(models.Model):
     status_pedido = models.CharField(max_length=50)
 
     def __str__(self):
-        return f'Pedido #{self.id} - {self.usuario.username}'
+        return f'Pedido #{self.pk}'
 
     class Meta:
         ordering = ['-data_pedido']
@@ -19,7 +19,7 @@ class ItemPedido(models.Model):
     quantidade = models.PositiveIntegerField()
 
     def __str__(self):
-        return f'{self.nome_item} x{self.quantidade} - Pedido #{self.pedido.id}'
+        return f'{self.nome_item} x{self.quantidade} - ItemPedido #{self.pk}'
 
     class Meta:
         ordering = ['pedido']
@@ -31,7 +31,7 @@ class Atendente(models.Model):
     senha = models.CharField(max_length=128)
 
     def __str__(self):
-        return self.nome
+        return f'{self.nome}'
 
     class Meta:
         ordering = ['nome']
@@ -66,7 +66,7 @@ class TicketSuporte(models.Model):
     data_fechamento = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f'Ticket #{self.id} - {self.usuario.username} - {self.tipo_ticket}'
+        return f'Ticket #{self.pk} - {self.tipo_ticket}'
 
     class Meta:
         ordering = ['-data_abertura']
@@ -81,7 +81,7 @@ class MensagemAtendimento(models.Model):
     data_envio = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'Mensagem #{self.id} - Ticket #{self.ticket.id}'
+        return f'Mensagem #{self.pk} - MensagemAtendimento #{self.pk}'
 
     class Meta:
         ordering = ['data_envio']
