@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from .models import Pedido, ItemPedido, Atendente, TicketSuporte, MensagemAtendimento
 
 class PedidoCreate(CreateView):
-    template_name = "templates/form.html"
+    template_name = "suporte/form.html"
     model = Pedido
     success_url = reverse_lazy("index")
     fields = ["usuario", "data_pedido", "status_pedido"]
@@ -13,7 +13,7 @@ class PedidoCreate(CreateView):
     }
 
 class ItemPedidoCreate(CreateView):
-    template_name = "templates/form.html"
+    template_name = "suporte/form.html"
     model = ItemPedido
     success_url = reverse_lazy("index")
     fields = ["pedido", "nome_item", "quantidade"]
@@ -22,7 +22,7 @@ class ItemPedidoCreate(CreateView):
     }
 
 class AtendenteCreate(CreateView):
-    template_name = "templates/form.html"
+    template_name = "suporte/form.html"
     model = Atendente
     success_url = reverse_lazy("index")
     fields = ["nome", "email", "senha"]
@@ -31,7 +31,7 @@ class AtendenteCreate(CreateView):
     }
 
 class TicketSuporteCreate(CreateView):
-    template_name = "templates/form.html"
+    template_name = "suporte/form.html"
     model = TicketSuporte
     success_url = reverse_lazy("index")
     fields = [
@@ -49,7 +49,7 @@ class TicketSuporteCreate(CreateView):
     }
 
 class MensagemAtendimentoCreate(CreateView):
-    template_name = "templates/form.html"
+    template_name = "suporte/form.html"
     model = MensagemAtendimento
     success_url = reverse_lazy("index")
     fields = ["ticket", "usuario", "mensagem"]
