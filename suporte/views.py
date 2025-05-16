@@ -1,4 +1,4 @@
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView 
 from django.urls import reverse_lazy
 
 from .models import Pedido, ItemPedido, Atendente, TicketSuporte, MensagemAtendimento
@@ -55,4 +55,60 @@ class MensagemAtendimentoCreate(CreateView):
     fields = ["ticket", "usuario", "mensagem"]
     extra_context = {
         "titulo": "Cadastro de Mensagem de Atendimento"
+    }
+
+##############
+
+class PedidoUpdate(UpdateView):
+    template_name = "suporte/form.html"
+    model = Pedido
+    success_url = reverse_lazy("index")
+    fields = ["usuario", "data_pedido", "status_pedido"]
+    extra_context = {
+        "titulo": "Edição de Pedido"
+    }
+
+class ItemPedidoUpdate(UpdateView):
+    template_name = "suporte/form.html"
+    model = ItemPedido
+    success_url = reverse_lazy("index")
+    fields = ["pedido", "nome_item", "quantidade"]
+    extra_context = {
+        "titulo": "Edição de Item do Pedido"
+    }
+
+class AtendenteUpdate(UpdateView):
+    template_name = "suporte/form.html"
+    model = Atendente
+    success_url = reverse_lazy("index")
+    fields = ["nome", "email", "senha"]
+    extra_context = {
+        "titulo": "Edição de Atendente"
+    }
+
+class TicketSuporteUpdate(UpdateView):
+    template_name = "suporte/form.html"
+    model = TicketSuporte
+    success_url = reverse_lazy("index")
+    fields = [
+        "usuario",
+        "pedido",
+        "item_pedido",
+        "atendente",
+        "tipo_ticket",
+        "status_ticket",
+        "descricao_problema",
+        "data_fechamento"
+    ]
+    extra_context = {
+        "titulo": "Edição de Ticket de Suporte"
+    }
+
+class MensagemAtendimentoUpdate(UpdateView):
+    template_name = "suporte/form.html"
+    model = MensagemAtendimento
+    success_url = reverse_lazy("index")
+    fields = ["ticket", "usuario", "mensagem"]
+    extra_context = {
+        "titulo": "Edição de Mensagem de Atendimento"
     }
