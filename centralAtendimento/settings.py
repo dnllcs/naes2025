@@ -25,8 +25,7 @@ SECRET_KEY = "django-insecure-)i6^%90x!5$g^ql-1r$(ajo-+b57dx%4_b-(+a$&i5+bux3p)*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -131,7 +130,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = 'static_gcloud/'
+STATIC_ROOT = BASE_DIR / 'static_gcloud/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
