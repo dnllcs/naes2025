@@ -1,87 +1,126 @@
 from django.db import models
 from django.contrib.auth.models import User
-
-class Pedido(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.PROTECT)
-    data_pedido = models.DateTimeField()
-    status_pedido = models.CharField(max_length=50)
-
-    def __str__(self):
-        return f'Pedido #{self.pk}'
-
-    class Meta:
-        ordering = ['-data_pedido']
+from django.utils import timezone
 
 
-class ItemPedido(models.Model):
-    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-    nome_item = models.CharField(max_length=200)
-    quantidade = models.PositiveIntegerField()
-
-    def __str__(self):
-        return f'{self.nome_item} x{self.quantidade} - ItemPedido #{self.pk}'
-
-    class Meta:
-        ordering = ['pedido']
-
-
-class Atendente(models.Model):
+class Estado(models.Model):
     nome = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-    senha = models.CharField(max_length=128)
+    sigla = models.CharField(max_length=2, unique=True)
 
     def __str__(self):
-        return f'{self.nome}'
+        return self.sigla
 
     class Meta:
         ordering = ['nome']
 
 
-class TicketSuporte(models.Model):
-    TIPO_CHOICES = [
-        ('devolucao', 'Devolução'),
-        ('troca', 'Troca'),
-        ('reclamacao', 'Reclamação'),
-        ('duvida', 'Dúvida'),
+class Cliente(models.Model):
+    nome = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    telefone = models.CharField(max_length=20, blank=True)
+    cidade = models.CharField(max_length=100, blank=True)
+    estado = models.ForeignKey(Estado, on_delete=models.PROTECT)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.nome
+
+    class Meta:
+        ordering = ['nome']
+
+
+class Atendente(models.Model):
+    nome = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    telefone = models.CharField(max_length=20, blank=True)
+    departamento = models.CharField(max_length=100, blank=True)
+    data_contratacao = models.DateField(default=timezone.now)
+
+    def __str__(self):
+        return self.nome
+
+    class Meta:
+        ordering = ['nome']
+
+
+class CategoriaTicket(models.Model):
+    nome = models.CharField(max_length=100)
+    descricao = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.nome
+
+    class Meta:
+        ordering = ['nome']
+
+
+class StatusTicket(models.Model):
+    nome = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.nome
+
+    class Meta:
+        ordering = ['nome']
+
+class Ticket(models.Model):
+    PRIORIDADE_CHOICES = [
+        ('baixa', 'Baixa'),
+        ('media', 'Média'),
+        ('alta', 'Alta'),
     ]
 
-    STATUS_CHOICES = [
-        ('aberto', 'Aberto'),
-        ('andamento', 'Em Andamento'),
-        ('resolvido', 'Resolvido'),
-        ('fechado', 'Fechado'),
-    ]
-
-    usuario = models.ForeignKey(User, on_delete=models.PROTECT)
-    pedido = models.ForeignKey(
-        Pedido, on_delete=models.SET_NULL, null=True, blank=True)
-    item_pedido = models.ForeignKey(
-        ItemPedido, on_delete=models.SET_NULL, null=True, blank=True)
-    atendente = models.ForeignKey(
-        Atendente, on_delete=models.SET_NULL, null=True, blank=True)
-    tipo_ticket = models.CharField(max_length=20, choices=TIPO_CHOICES)
-    status_ticket = models.CharField(max_length=20, choices=STATUS_CHOICES)
-    descricao_problema = models.TextField()
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    atendente_responsavel = models.ForeignKey(
+        Atendente, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    categoria = models.ForeignKey(CategoriaTicket, on_delete=models.PROTECT)
+    status_atual = models.ForeignKey(StatusTicket, on_delete=models.PROTECT)
+    titulo = models.CharField(max_length=200)
+    descricao = models.TextField()
+    prioridade = models.CharField(max_length=10, choices=PRIORIDADE_CHOICES, default='media')
     data_abertura = models.DateTimeField(auto_now_add=True)
     data_fechamento = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f'Ticket #{self.pk} - {self.tipo_ticket}'
+        return f'Ticket #{self.pk} - {self.titulo}'
 
     class Meta:
         ordering = ['-data_abertura']
-        verbose_name = 'Ticket de Suporte'
-        verbose_name_plural = 'Tickets de Suporte'
 
 
-class MensagemAtendimento(models.Model):
-    ticket = models.ForeignKey(TicketSuporte, on_delete=models.CASCADE)
-    usuario = models.ForeignKey(User, on_delete=models.PROTECT)
-    mensagem = models.TextField()
+class Mensagem(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name="mensagens")
+    autor_cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True)
+    autor_atendente = models.ForeignKey(Atendente, on_delete=models.SET_NULL, null=True, blank=True)
+    conteudo = models.TextField()
     data_envio = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'Mensagem #{self.pk} - MensagemAtendimento #{self.pk}'
+        return f'Mensagem #{self.pk} - Ticket {self.ticket.pk}'
 
     class Meta:
         ordering = ['data_envio']
+
+
+class AvaliacaoAtendimento(models.Model):
+    ticket = models.OneToOneField(Ticket, on_delete=models.CASCADE)
+    nota = models.PositiveSmallIntegerField()
+    comentario = models.TextField(blank=True)
+    data_avaliacao = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Avaliação Ticket #{self.ticket.pk} - Nota {self.nota}'
+
+
+class HistoricoStatus(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name="historico_status")
+    status = models.ForeignKey(StatusTicket, on_delete=models.PROTECT)
+    alterado_por = models.ForeignKey(Atendente, on_delete=models.SET_NULL, null=True)
+    data_alteracao = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Histórico #{self.pk} - Ticket {self.ticket.pk} [{self.status}]'
+
+    class Meta:
+        ordering = ['-data_alteracao']
