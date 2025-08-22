@@ -1,114 +1,89 @@
-from django.views.generic.edit import CreateView, UpdateView 
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from .models import (
+    Cliente, Atendente, Ticket, CategoriaTicket,
+    StatusTicket, Mensagem, AvaliacaoAtendimento, HistoricoStatus
+)
 
-from .models import Pedido, ItemPedido, Atendente, TicketSuporte, MensagemAtendimento
+class ClienteList(ListView):
+    template_name = "suporte/cliente_list.html"
+    model = Cliente
+    context_object_name = "clientes"
 
-class PedidoCreate(CreateView):
+class ClienteCreate(CreateView):
     template_name = "suporte/form.html"
-    model = Pedido
-    success_url = reverse_lazy("index")
-    fields = ["usuario", "data_pedido", "status_pedido"]
-    extra_context = {
-        "titulo": "Cadastro de Pedido"
-    }
+    model = Cliente
+    fields = ["nome", "email", "telefone", "cidade", "estado"]
+    success_url = reverse_lazy("cliente_list")
+    extra_context = {"titulo": "Cadastro de Cliente"}
 
-class ItemPedidoCreate(CreateView):
+class ClienteUpdate(UpdateView):
     template_name = "suporte/form.html"
-    model = ItemPedido
-    success_url = reverse_lazy("index")
-    fields = ["pedido", "nome_item", "quantidade"]
-    extra_context = {
-        "titulo": "Cadastro de Item do Pedido"
-    }
+    model = Cliente
+    fields = ["nome", "email", "telefone", "cidade", "estado"]
+    success_url = reverse_lazy("cliente_list")
+    extra_context = {"titulo": "Atualizar Cliente"}
+
+class ClienteDelete(DeleteView):
+    template_name = "suporte/confirm_delete.html"
+    model = Cliente
+    success_url = reverse_lazy("cliente_list")
+    extra_context = {"titulo": "Excluir Cliente"}
+
+class AtendenteList(ListView):
+    template_name = "suporte/atendente_list.html"
+    model = Atendente
+    context_object_name = "atendentes"
 
 class AtendenteCreate(CreateView):
     template_name = "suporte/form.html"
     model = Atendente
-    success_url = reverse_lazy("index")
-    fields = ["nome", "email", "senha"]
-    extra_context = {
-        "titulo": "Cadastro de Atendente"
-    }
+    fields = ["nome", "email", "telefone", "departamento", "data_contratacao"]
+    success_url = reverse_lazy("atendente_list")
+    extra_context = {"titulo": "Cadastro de Atendente"}
 
-class TicketSuporteCreate(CreateView):
+class TicketList(ListView):
+    template_name = "suporte/ticket_list.html"
+    model = Ticket
+    context_object_name = "tickets"
+
+
+class TicketDetail(DetailView):
+    template_name = "suporte/ticket_detail.html"
+    model = Ticket
+    context_object_name = "ticket"
+
+
+class TicketCreate(CreateView):
     template_name = "suporte/form.html"
-    model = TicketSuporte
-    success_url = reverse_lazy("index")
+    model = Ticket
     fields = [
-        "usuario",
-        "pedido",
-        "item_pedido",
-        "atendente",
-        "tipo_ticket",
-        "status_ticket",
-        "descricao_problema",
-        "data_fechamento"
+        "cliente", "atendente_responsavel", "categoria",
+        "status_atual", "titulo", "descricao", "prioridade"
     ]
-    extra_context = {
-        "titulo": "Cadastro de Ticket de Suporte"
-    }
+    success_url = reverse_lazy("ticket_list")
+    extra_context = {"titulo": "Abrir Novo Ticket"}
 
-class MensagemAtendimentoCreate(CreateView):
+class TicketUpdate(UpdateView):
     template_name = "suporte/form.html"
-    model = MensagemAtendimento
-    success_url = reverse_lazy("index")
-    fields = ["ticket", "usuario", "mensagem"]
-    extra_context = {
-        "titulo": "Cadastro de Mensagem de Atendimento"
-    }
-
-##############
-
-class PedidoUpdate(UpdateView):
-    template_name = "suporte/form.html"
-    model = Pedido
-    success_url = reverse_lazy("index")
-    fields = ["usuario", "data_pedido", "status_pedido"]
-    extra_context = {
-        "titulo": "Edição de Pedido"
-    }
-
-class ItemPedidoUpdate(UpdateView):
-    template_name = "suporte/form.html"
-    model = ItemPedido
-    success_url = reverse_lazy("index")
-    fields = ["pedido", "nome_item", "quantidade"]
-    extra_context = {
-        "titulo": "Edição de Item do Pedido"
-    }
-
-class AtendenteUpdate(UpdateView):
-    template_name = "suporte/form.html"
-    model = Atendente
-    success_url = reverse_lazy("index")
-    fields = ["nome", "email", "senha"]
-    extra_context = {
-        "titulo": "Edição de Atendente"
-    }
-
-class TicketSuporteUpdate(UpdateView):
-    template_name = "suporte/form.html"
-    model = TicketSuporte
-    success_url = reverse_lazy("index")
+    model = Ticket
     fields = [
-        "usuario",
-        "pedido",
-        "item_pedido",
-        "atendente",
-        "tipo_ticket",
-        "status_ticket",
-        "descricao_problema",
-        "data_fechamento"
+        "atendente_responsavel", "categoria",
+        "status_atual", "titulo", "descricao", "prioridade"
     ]
-    extra_context = {
-        "titulo": "Edição de Ticket de Suporte"
-    }
+    success_url = reverse_lazy("ticket_list")
+    extra_context = {"titulo": "Atualizar Ticket"}
 
-class MensagemAtendimentoUpdate(UpdateView):
+class MensagemCreate(CreateView):
     template_name = "suporte/form.html"
-    model = MensagemAtendimento
-    success_url = reverse_lazy("index")
-    fields = ["ticket", "usuario", "mensagem"]
-    extra_context = {
-        "titulo": "Edição de Mensagem de Atendimento"
-    }
+    model = Mensagem
+    fields = ["ticket", "autor_cliente", "autor_atendente", "conteudo"]
+    success_url = reverse_lazy("ticket_list")
+    extra_context = {"titulo": "Nova Mensagem"}
+
+class AvaliacaoCreate(CreateView):
+    template_name = "suporte/form.html"
+    model = AvaliacaoAtendimento
+    fields = ["ticket", "nota", "comentario"]
+    success_url = reverse_lazy("ticket_list")
+    extra_context = {"titulo": "Avaliar Atendimento"}
