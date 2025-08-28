@@ -10,9 +10,11 @@ TicketDetail,
 TicketCreate,
 TicketUpdate,
 MensagemCreate,
-AvaliacaoCreate)
+AvaliacaoCreate, 
+IndexView)
 
 urlpatterns = [
+    path('', IndexView.as_view(), name="index"),
     path("clientes/", ClienteList.as_view(), name="cliente_list"),
     path("clientes/cadastrar/", ClienteCreate.as_view(), name="cliente_create"),
     path("clientes/<int:pk>/editar/", ClienteUpdate.as_view(), name="cliente_update"),
