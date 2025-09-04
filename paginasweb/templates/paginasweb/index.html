@@ -1,0 +1,119 @@
+{% extends "paginasweb/modelos/base.html" %}
+
+{% load static %}
+
+{% block title %}Página Inicial - Central de Atendimento{% endblock title %}
+
+{% block content %}
+<header class="py-5 bg-light border-bottom mb-5">
+    <div class="container px-5 my-5">
+        <div class="text-center mb-5">
+            <h1 class="display-3 fw-bolder text-dark mb-2">Central de Atendimento</h1>
+            <p class="lead fw-normal text-muted mb-4">
+                Abra um ticket para obter suporte rápido e eficiente. Nossa equipe está pronta para ajudar!
+            </p>
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                {% if user.is_authenticated %}
+                    <a class="btn btn-primary btn-lg px-4 me-sm-3" href="{% url 'criar_ticket' %}">
+                        <i class="bi bi-plus-circle me-2"></i> Abrir Novo Ticket
+                    </a>
+                    <a class="btn btn-outline-primary btn-lg px-4" href="{% url 'meus_tickets' %}">
+                        <i class="bi bi-ticket-perforator me-2"></i> Meus Tickets
+                    </a>
+                {% else %}
+                    <a class="btn btn-primary btn-lg px-4 me-sm-3" href="{% url 'criar_ticket' %}">
+                        <i class="bi bi-plus-circle me-2"></i> Abrir Novo Ticket
+                    </a>
+                    <a class="btn btn-outline-secondary btn-lg px-4" href="{% url 'login' %}">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Login
+                    </a>
+                    <a class="btn btn-outline-secondary btn-lg px-4" href="{% url 'registrar' %}">
+                        <i class="bi bi-person-plus me-2"></i> Criar Conta
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="py-5">
+    <div class="container px-5">
+        <div class="row gx-5">
+            <div class="col-lg-4 mb-5">
+                <div class="card bg-light p-4 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-3 d-inline-block p-3">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <h2 class="h5 card-title">Rápido e Eficaz</h2>
+                        <p class="card-text text-muted">Acompanhe o status do seu ticket e interaja com a nossa equipe em tempo real.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-5">
+                <div class="card bg-light p-4 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-3 d-inline-block p-3">
+                            <i class="bi bi-file-earmark-lock"></i>
+                        </div>
+                        <h2 class="h5 card-title">Dados Seguros</h2>
+                        <p class="card-text text-muted">Toda sua conversa e informações são protegidas e confidenciais.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-5">
+                <div class="card bg-light p-4 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-3 d-inline-block p-3">
+                            <i class="bi bi-person-badge"></i>
+                        </div>
+                        <h2 class="h5 card-title">Suporte Especializado</h2>
+                        <p class="card-text text-muted">Nossos atendentes são especialistas em diversas áreas para resolver seu problema.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-white">
+    <div class="container px-5">
+        <div class="row gx-5">
+            <div class="col-lg-6">
+                <h2 class="fw-bolder mb-4">Estatísticas do Sistema</h2>
+                <ul class="list-group list-group-flush shadow-sm rounded-3">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Tickets Totais <span class="badge bg-primary rounded-pill">{{ qtde_tickets }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Tickets Abertos <span class="badge bg-warning text-dark rounded-pill">{{ qtde_tickets_abertos }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Tickets Fechados <span class="badge bg-success rounded-pill">{{ qtde_tickets_fechados }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Média de Avaliação <span class="badge bg-info text-dark rounded-pill">{{ media_avaliacao|floatformat:"1" }}/5</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-6 mt-5 mt-lg-0">
+                <h2 class="fw-bolder mb-4">Últimos Tickets Criados</h2>
+                <div class="list-group shadow-sm rounded-3">
+                    {% for ticket in ultimos_tickets %}
+                    <a href="{% url 'visualizar_ticket' ticket.pk %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ ticket.titulo }}</h5>
+                            <small class="text-muted">{{ ticket.data_abertura|date:"d/m/Y" }}</small>
+                        </div>
+                        <p class="mb-1 text-muted">{{ ticket.descricao|truncatechars:80 }}</p>
+                        <small>Status: <span class="badge bg-secondary">{{ ticket.status_atual }}</span></small>
+                    </a>
+                    {% empty %}
+                    <a href="#" class="list-group-item list-group-item-action disabled">Nenhum ticket recente.</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

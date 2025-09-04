@@ -1,0 +1,44 @@
+{% extends "paginasweb/modelos/base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {{ page_title|default:"Formulário" }}
+{% endblock title %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container px-5">
+        <div class="row gx-5 justify-content-center">
+            <div class="col-lg-8">
+                <div class="card p-4 shadow-sm border-0 rounded-3">
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bolder text-primary mb-1">
+                                {{ page_title|default:"Formulário" }}
+                            </h2>
+                            {% if page_subtitle %}
+                            <p class="lead text-muted">{{ page_subtitle }}</p>
+                            {% endif %}
+                        </div>
+
+                        <form method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            <hr class="my-4">
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button class="btn btn-outline-secondary btn-lg" type="button" onclick="history.back()">
+                                    <i class="bi bi-arrow-left me-2"></i> Voltar
+                                </button>
+                                <button class="btn btn-primary btn-lg" type="submit">
+                                    <i class="bi bi-check-circle me-2"></i> {{ submit_button_text|default:"Salvar" }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
